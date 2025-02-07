@@ -1,0 +1,117 @@
+Figure 3. Estimated fixed effects and 95% confidence intervals 
+
+########## Oregon State ##########
+
+# Estimated fixed effect
+
+con <- confint(downy.lm1, oldNames = FALSE)
+con <- con[c(4:14), ]
+
+con <- as.matrix(con[,])
+rownames(con) <- c("Non-treated", "MOA 11", "MOA 33", "MOA 4","MOA 40",
+                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+colnames(con) <- c("lower","upper")
+con <- data.frame(con)
+con$estimate <- (con$lower + con$upper)/2
+con$MOA <- c("Non-treated", "MOA 11", "MOA 33", "MOA 4","MOA 40",
+             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+conf <- inner_join(con, DM3_meancountMOA, by="MOA")
+conf$N <- conf$n
+
+png("conf_OR.png",width=20,height=15,units="cm" , res = 1000)
+ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
+  geom_errorbar(aes(xmin = lower, xmax = upper), size = 1, width = 0.2,
+                position = position_dodge(width = 0.6)) +
+  theme_classic() + 
+  geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
+                                  axis.title=element_text(size=12,face="bold")) + 
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+dev.off()
+
+# Contrast
+
+library(multcomp)
+library(lme4)
+
+lsmeans(downy.lm1,pairwise ~ MOA)
+
+lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
+cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
+
+########## Washinngton State ##########
+
+# Estimated fixed effect
+
+con <- confint(downy.lm1, oldNames = FALSE)
+con <- con[c(4:8), ]
+
+con <- as.matrix(con[,])
+rownames(con) <- c("Non-treated", "MOA 11", "MOA 22", "MOA 33","MOA 40")
+colnames(con) <- c("lower","upper")
+con <- data.frame(con)
+con$estimate <- (con$lower + con$upper)/2
+con$MOA <- c("Non-treated", "MOA 11", "MOA 22", "MOA 33","MOA 40")
+
+conf <- inner_join(con, DM3_meancountMOA, by="MOA")
+conf$N <- conf$n
+png("conf_WA.png",width=20,height=15,units="cm" , res = 1000)
+ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
+  geom_errorbar(aes(xmin = lower, xmax = upper), size = 1, width = 0.2,
+                position = position_dodge(width = 0.6)) +
+  theme_classic() + 
+  geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
+                                  axis.title=element_text(size=12,face="bold")) + 
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+dev.off()
+
+
+# Contrast
+
+library(multcomp)
+library(lme4)
+
+lsmeans(downy.lm1,pairwise ~ MOA)
+
+lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
+cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
+
+
+########## Total ##########
+
+# Estimated fixed effect
+
+con <- confint(downy.lm1, oldNames = FALSE)
+con <- con[c(4:19), ]
+
+con <- as.matrix(con[,])
+rownames(con) <- c("Non-treated", "MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
+                   "MOA 33", "MOA 39", "MOA 4", "MOA 40",
+                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+colnames(con) <- c("lower","upper")
+con <- data.frame(con)
+con$estimate <- (con$lower + con$upper)/2
+con$MOA <- c("Non-treated", "MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
+             "MOA 33", "MOA 39", "MOA 4", "MOA 40",
+             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+conf <- inner_join(con, DM3_meancountMOA, by="MOA")
+conf$N <- conf$n
+
+png("conf.png",width=20,height=15,units="cm" , res = 1000)
+ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
+  geom_errorbar(aes(xmin = lower, xmax = upper), size = 1, width = 0.2,
+                position = position_dodge(width = 0.6)) +
+  theme_classic() + 
+  geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
+                                  axis.title=element_text(size=12,face="bold")) + 
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+dev.off()
+
+# Contrast
+
+library(multcomp)
+library(lme4)
+
+lsmeans(downy.lm1,pairwise ~ MOA)
+
+lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
+cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
