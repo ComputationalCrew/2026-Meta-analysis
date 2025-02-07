@@ -1,0 +1,244 @@
+### Figure 1. Distribution of the mean number of hop shoots 
+
+########## Oregon State ##########
+
+DM3 <- downy %>%
+  filter(State %in% c("Oregon")) %>%
+  filter(MOA %in% c('33', 'M1', '49_4', '4', '40', '43', '49_40', 'BM', '11', 'U17','Non-treated'))
+
+# Get mean of number of plots that evaluated a given trail in each MOA
+DM3_meansd <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(mean = mean(tResponse_ratio),sd = sd(tResponse_ratio))
+
+# Spikes
+DM3_meansdSpikes <- DM3 %>%
+group_by(Trial, MOA) %>%
+summarise(meanSpikes = mean(Spikes),sdSpikes = sd(Spikes))
+
+DM3_meancount <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA <- DM3 %>%
+  group_by(MOA) %>%
+  summarise(n = n())
+
+# generate combined cell (trial&MOA, remove duplicate rows first and below code) 
+DM3_meancountGroup <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA$MOA1 <- c("MOA 11", "MOA 33", "MOA 4", "MOA 40",
+                   "MOA 43","MOA 49_4","MOA 49_40", 'MOA BM', "MOA M1", "Non-treated","MOA U17")
+DM3_meancountMOA$MOA2 <- DM3_meancountMOA$MOA
+DM3_meancountMOA$MOA <- DM3_meancountMOA$MOA1
+
+DM3_meantrial <- DM3 %>%
+  group_by(Trial) %>%
+  summarise(meanSpike = mean(Spikes))
+
+DM3$name <- as.factor(paste(DM3$Trial, DM3$MOA, sep = ""))
+DM3_meansd$name <- as.factor(paste(DM3_meansd$Trial, DM3_meansd$MOA, sep = ""))
+DM3_meansdSpikes$name <- as.factor(paste(DM3_meansdSpikes$Trial, DM3_meansdSpikes$MOA, sep = ""))
+DM3_meancount$name <- as.factor(paste(DM3_meancount$Trial, DM3_meancount$MOA, sep = ""))
+
+
+# merging the two dataframes by using  
+# inner_join function 
+DM3join <- inner_join(DM3, DM3_meansd, DM3_meancount, by="name")
+DM3joinO <- inner_join(DM3join, DM3_meansdSpikes, DM3_meancount, by="name")
+DM3joinN <- inner_join(DM3joinO, DM3_meancount, by="name")
+
+DM3joinN$Trial <- DM3joinN$Trial.x
+DM3joinN$MOA <- DM3joinN$MOA.x
+DM3joinW <- inner_join(DM3joinN, DM3_meantrial, by="Trial")
+DM3joinW$mSpikesTrial <- DM3joinW$meanSpike
+
+
+# Clean data
+Meta_downy <- select(DM3joinW , Year, Trial, MOA, State, tResponse_ratio, 
+                     Rep, mSpikesTrial, n, Rep, meanSpikes, sdSpikes, Spikes, Disease_Control, Response_ratio, Treat) #w,
+
+Meta_downy$Trial <- as.factor(Meta_downy$Trial)
+Meta_downy$Rep <- as.factor(Meta_downy$Rep)
+Meta_downy$MOA <- as.factor(Meta_downy$MOA)
+Meta_downy$Treat <- as.factor(Meta_downy$Treat)
+
+str(Meta_downy)
+
+# Figure 1
+# Prelim analysis
+
+png("Spikes_OR.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = Spikes, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Spikes per plant", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
+
+png("Response_OR.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = tResponse_ratio, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Response ratio", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
+
+########## Washinngton State ##########
+
+DM3 <- downy %>%
+  filter(State %in% c("Washington")) %>%
+  filter(MOA %in% c('33', '40', '11', '22','Non-treated'))
+
+
+# Get mean of number of plots that evaluated a given trail in each MOA
+DM3_meansd <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(mean = mean(tResponse_ratio),sd = sd(tResponse_ratio))
+
+# Spikes
+DM3_meansdSpikes <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(meanSpikes = mean(Spikes),sdSpikes = sd(Spikes))
+
+DM3_meancount <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA <- DM3 %>%
+  group_by(MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA$MOA1 <- c("MOA 11", "MOA 22", "MOA 33", "MOA 40",
+                           "Non-treated")
+DM3_meancountMOA$MOA2 <- DM3_meancountMOA$MOA
+DM3_meancountMOA$MOA <- DM3_meancountMOA$MOA1
+
+DM3_meantrial <- DM3 %>%
+  group_by(Trial) %>%
+  summarise(meanSpike = mean(Spikes))
+
+DM3$name <- as.factor(paste(DM3$Trial, DM3$MOA, sep = ""))
+DM3_meansd$name <- as.factor(paste(DM3_meansd$Trial, DM3_meansd$MOA, sep = ""))
+DM3_meansdSpikes$name <- as.factor(paste(DM3_meansdSpikes$Trial, DM3_meansdSpikes$MOA, sep = ""))
+DM3_meancount$name <- as.factor(paste(DM3_meancount$Trial, DM3_meancount$MOA, sep = ""))
+
+# merging the two dataframes by using  
+# inner_join function 
+DM3join <- inner_join(DM3, DM3_meansd, DM3_meancount, by="name")
+DM3joinO <- inner_join(DM3join, DM3_meansdSpikes, DM3_meancount, by="name")
+DM3joinN <- inner_join(DM3joinO, DM3_meancount, by="name")
+
+DM3joinN$Trial <- DM3joinN$Trial.x
+DM3joinN$MOA <- DM3joinN$MOA.x
+DM3joinW <- inner_join(DM3joinN, DM3_meantrial, by="Trial")
+DM3joinW$mSpikesTrial <- DM3joinW$meanSpike
+
+# Clean data
+Meta_downy <- select(DM3joinW , Year, Trial, MOA, State, tResponse_ratio, Treat,
+                     Rep, mSpikesTrial, n, Rep, meanSpikes, sdSpikes, Spikes, Disease_Control, Response_ratio) #w,
+
+Meta_downy$Trial <- as.factor(Meta_downy$Trial)
+Meta_downy$Rep <- as.factor(Meta_downy$Rep)
+Meta_downy$MOA <- as.factor(Meta_downy$MOA)
+
+str(Meta_downy)
+
+
+# Prelim analysis
+
+png("Spikes_WA.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = Spikes, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Spikes per plant", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
+
+png("Response_WA.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = tResponse_ratio, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Response ratio", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
+
+
+########## Total ##########
+
+DM3 <- downy %>%
+  filter(MOA %in% c('33', '40', '43', '11',
+                    '49_4', 'M1', '4', '49_40',
+                    'BM', '21', '22', '11_7',
+                    '27_M1', '39', 'U17','Non-treated'))
+
+# Get mean of number of plots that evaluated a given trail in each MOA
+DM3_meansd <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(mean = mean(tResponse_ratio),sd = sd(tResponse_ratio))
+
+# Spikes
+DM3_meansdSpikes <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(meanSpikes = mean(Spikes),sdSpikes = sd(Spikes))
+
+DM3_meancount <- DM3 %>%
+  group_by(Trial, MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA <- DM3 %>%
+  group_by(MOA) %>%
+  summarise(n = n())
+
+DM3_meancountMOA$MOA1 <- c("MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
+                           "MOA 33", "MOA 39", "MOA 4", "MOA 40",
+                           "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "Non-treated","MOA U17")
+DM3_meancountMOA$MOA2 <- DM3_meancountMOA$MOA
+DM3_meancountMOA$MOA <- DM3_meancountMOA$MOA1
+
+DM3_meantrial <- DM3 %>%
+  group_by(Trial) %>%
+  summarise(meanSpike = mean(Spikes))
+
+DM3$name <- as.factor(paste(DM3$Trial, DM3$MOA, sep = ""))
+DM3_meansd$name <- as.factor(paste(DM3_meansd$Trial, DM3_meansd$MOA, sep = ""))
+DM3_meansdSpikes$name <- as.factor(paste(DM3_meansdSpikes$Trial, DM3_meansdSpikes$MOA, sep = ""))
+DM3_meancount$name <- as.factor(paste(DM3_meancount$Trial, DM3_meancount$MOA, sep = ""))
+
+
+# merging the two dataframes by using  
+# inner_join function 
+DM3join <- inner_join(DM3, DM3_meansd, DM3_meancount, by="name")
+DM3joinO <- inner_join(DM3join, DM3_meansdSpikes, DM3_meancount, by="name")
+DM3joinN <- inner_join(DM3joinO, DM3_meancount, by="name")
+
+DM3joinN$Trial <- DM3joinN$Trial.x
+DM3joinN$MOA <- DM3joinN$MOA.x
+DM3joinW <- inner_join(DM3joinN, DM3_meantrial, by="Trial")
+DM3joinW$mSpikesTrial <- DM3joinW$meanSpike
+
+# Clean data
+Meta_downy <- select(DM3joinW , Year, Trial, MOA, State, tResponse_ratio, Treat,
+                     Rep, mSpikesTrial, n, Rep, meanSpikes, sdSpikes, Spikes, Disease_Control, Response_ratio) #w,
+
+
+Meta_downy$Trial <- as.factor(Meta_downy$Trial)
+Meta_downy$Rep <- as.factor(Meta_downy$Rep)
+Meta_downy$MOA <- as.factor(Meta_downy$MOA)
+Meta_downy$State <- as.factor(Meta_downy$State)
+
+str(Meta_downy)
+
+# Prelim analysis
+
+png("Spikes.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = Spikes, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Spikes per plant", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
+
+png("Response.png",width=12,height=8,units="cm" , res = 1000)
+ggplot(Meta_downy, aes(x = tResponse_ratio, fill = Treat)) +
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Response ratio", y = "Frequency") +
+  theme_classic() + labs(fill = "MOA")
+dev.off()
