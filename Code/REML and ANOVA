@@ -1,0 +1,14 @@
+# You need to run distribution of the mean n
+
+
+library("lsmeans")
+library(lme4)
+
+Meta_downy <- within(Meta_downy, MOA <- relevel(MOA, ref = "Non-treated"))
+
+# https://stats.stackexchange.com/questions/400700/why-do-we-do-crossed-vs-nested-vs-other-random-effects
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) 
+                  , REML=TRUE, data = Meta_downy)
+
+
