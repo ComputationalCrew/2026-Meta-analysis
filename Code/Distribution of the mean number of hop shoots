@@ -1,3 +1,19 @@
+# Load necessary library
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(emmeans)
+library(tidyr)
+library(readr)
+library(pivottabler)
+library(dplyr)
+library(stats)
+library(NMA)
+library(multinma)
+library(dplyr)
+library(metafor)
+library(writexl)
+
 ### Figure 1. Distribution of the mean number of hop shoots 
 
 ########## Oregon State ##########
