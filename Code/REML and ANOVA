@@ -1,14 +1,36 @@
-# You need to run distribution of the mean n
-
+# You need to run distribution of the mean number of hop shoots code first.
 
 library("lsmeans")
 library(lme4)
 
 Meta_downy <- within(Meta_downy, MOA <- relevel(MOA, ref = "Non-treated"))
 
-# https://stats.stackexchange.com/questions/400700/why-do-we-do-crossed-vs-nested-vs-other-random-effects
+# For Oregon and Washington state
 
 downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) 
                   , REML=TRUE, data = Meta_downy)
 
+# Table 2. Summary statistics for type III test of fixed effects of mode of action and state
+anova(downy.lm1, type = 3)
 
+
+# Table 3. Fixed result
+summary(downy.lm1)
+
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes*MOA 
+                  , REML=TRUE, data = Meta_downy)
+
+# Total data
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + State + MOA*State
+                  , REML=TRUE, data = Meta_downy)
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes*MOA + State
+                  , REML=TRUE, data = Meta_downy)
+
+# Supplemental Table 2. Fixed effects of the main effect of fungicide mode of action (MOA), state, and their interaction 
+summary(downy.lm1)
+
+# Supplemental Table 3. Fixed effects of the main effect of fungicide mode of action (MOA), state, mean disease severity in a given trial (meanSpikes) and their interaction
+summary(downy.lm1)
