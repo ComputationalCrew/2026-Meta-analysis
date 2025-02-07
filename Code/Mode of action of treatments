@@ -1,0 +1,32 @@
+# Load necessary library
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(emmeans)
+library(tidyr)
+library(readr)
+library(pivottabler)
+library(dplyr)
+library(stats)
+library(NMA)
+library(multinma)
+library(dplyr)
+library(metafor)
+library(writexl)
+
+# Upload the raw data
+
+downy <- read.csv(".../Downy Mildew Fungicide Meta Analysis Database_Github.csv", check.names=FALSE)
+
+# Data manipulation
+downy  <- downy  %>%
+  mutate(MOA = ifelse(MOA %in% c("BM01", "BM02"), "BM", MOA))
+
+# Supplemental Table 1
+# Get count of number of plots that evaluated a given MOA in each state
+dm_count <- downy %>%
+  group_by(MOA, State) %>%
+  summarise(count = n())
+
+qpvt(downy, c("MOA", "State"), "Trial", "n()")
+
