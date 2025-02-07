@@ -1,18 +1,4 @@
-# Load necessary library
-library(dplyr)
-library(ggplot2)
-library(lme4)
-library(emmeans)
-library(tidyr)
-library(readr)
-library(pivottabler)
-library(dplyr)
-library(stats)
-library(NMA)
-library(multinma)
-library(dplyr)
-library(metafor)
-library(writexl)
+# You need to run mode of action of treatments code first.
 
 ### Figure 1. Distribution of the mean number of hop shoots 
 
