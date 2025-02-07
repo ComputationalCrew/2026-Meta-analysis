@@ -22,7 +22,7 @@ downy <- read.csv(".../Downy Mildew Fungicide Meta Analysis Database_Github.csv"
 downy  <- downy  %>%
   mutate(MOA = ifelse(MOA %in% c("BM01", "BM02"), "BM", MOA))
 
-# Supplemental Table 1
+# Table 1. Mode of action of treatments 
 # Get count of number of plots that evaluated a given MOA in each state
 dm_count <- downy %>%
   group_by(MOA, State) %>%
