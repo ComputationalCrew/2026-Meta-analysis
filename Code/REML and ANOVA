@@ -15,7 +15,16 @@ anova(downy.lm1, type = 3)
 
 
 # Table 3. Fixed result
+# Supplemental Table 4. Estimated variance of random effects
 summary(downy.lm1)
+
+library(merTools)
+predictInterval(downy.lm1) # for various model predictions, possibly
+REsim(downy.lm1) # mean, median and sd of the random effect
+
+png("meta_Random effect range.png",width=20,height=15,units="cm" , res = 1000)
+plotREsim(REsim(downy.lm1)) # plot the interval estimates
+dev.off()
 
 
 downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes*MOA 
