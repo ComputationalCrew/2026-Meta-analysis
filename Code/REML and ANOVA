@@ -1,45 +1,58 @@
-# You need to run distribution of the mean number of hop shoots code first.
-
-library("lsmeans")
+library(jtools)
+library(car)
+library(tidyverse)
+library(multcomp)
 library(lme4)
+library(dplyr)
+library(ggplot2)
+library(emmeans)
+library(tidyr)
+library(readr)
+library(pivottabler)
+library(stats)
+library(metafor)
+library(writexl)
 
-Meta_downy <- within(Meta_downy, MOA <- relevel(MOA, ref = "Non-treated"))
+# Create the data frame_Oregon
+Meta_downy <- read.csv("…/DM_GitHub_OR.csv", check.names=FALSE)
 
-# For Oregon and Washington state
+# Create the data frame_Washington
+Meta_downy <- read.csv("…/DM_GitHub_WA.csv", check.names=FALSE)
 
-downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) 
+# Create the data frame_Total
+Meta_downy <- read.csv("…/DM_GitHub_Total.csv", check.names=FALSE)
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) 
                   , REML=TRUE, data = Meta_downy)
 
-# Table 2. Summary statistics for type III test of fixed effects of mode of action and state
-anova(downy.lm1, type = 3)
+# Table 3 and Supplemental Table 5
+summ(downy.lm1)
 
+# Table 2
+anova_results <- Anova(downy.lm1, type = "III")
+print(anova_results)
 
-# Table 3. Fixed result
-# Supplemental Table 4. Estimated variance of random effects
-summary(downy.lm1)
-
-library(merTools)
-predictInterval(downy.lm1) # for various model predictions, possibly
-REsim(downy.lm1) # mean, median and sd of the random effect
-
-png("meta_Random effect range.png",width=20,height=15,units="cm" , res = 1000)
-plotREsim(REsim(downy.lm1)) # plot the interval estimates
+# Supplemental Figure 1
+png("residual.png",width=12,height=8,units="cm" , res = 1000)
+plot(downy.lm1)
 dev.off()
 
+png("qqnorm.png",width=12,height=8,units="cm" , res = 1000)
+qqnorm(resid(downy.lm1))
+dev.off()
 
-downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes*MOA 
+# Supplemental Table 2
+downy.state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + MOA*State
                   , REML=TRUE, data = Meta_downy)
+summ(downy.state)
 
-# Total data
+# Supplemental Table 3
 
-downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + State + MOA*State
+downy.mean_state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + meanSpikes +MOA*meanSpikes
                   , REML=TRUE, data = Meta_downy)
+summ(downy.mean_state)
 
-downy.lm1 <- lmer(tResponse_ratio ~ MOA + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes*MOA + State
+# Supplemental Table 4
+downy.mean <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes +MOA*meanSpikes
                   , REML=TRUE, data = Meta_downy)
-
-# Supplemental Table 2. Fixed effects of the main effect of fungicide mode of action (MOA), state, and their interaction 
-summary(downy.lm1)
-
-# Supplemental Table 3. Fixed effects of the main effect of fungicide mode of action (MOA), state, mean disease severity in a given trial (meanSpikes) and their interaction
-summary(downy.lm1)
+summ(downy.mean)
