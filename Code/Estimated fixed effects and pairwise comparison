@@ -1,22 +1,43 @@
-# You need to run REML and ANOVA code first.
-
 Figure 3. Estimated fixed effects and 95% confidence intervals 
 
-########## Oregon State ##########
+library(multcomp)
+library(lme4)
+library(dplyr)
+library(ggplot2)
+library(emmeans)
+library(tidyr)
+library(readr)
+library(pivottabler)
+library(stats)
+library(metafor)
+library(writexl)
 
-# Estimated fixed effect
 
+# Create the data frame_Oregon
+Meta_downy <- read.csv("…/DM_GitHub_OR.csv", check.names=FALSE)
+
+# Create the data frame_Washington
+Meta_downy <- read.csv("…/DM_GitHub_WA.csv", check.names=FALSE)
+
+# Create the data frame_Total
+Meta_downy <- read.csv("…/DM_GitHub_Total.csv", check.names=FALSE)
+
+downy.lm1 <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) 
+                  , REML=TRUE, data = Meta_downy)
+
+# Oregon
+# Fixed effect
 con <- confint(downy.lm1, oldNames = FALSE)
-con <- con[c(4:14), ]
+con <- con[c(7:16), ]
 
 con <- as.matrix(con[,])
-rownames(con) <- c("Non-treated", "MOA 11", "MOA 33", "MOA 4","MOA 40",
-                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+rownames(con) <- c("MOA 11", "MOA 4","MOA 40",
+                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA P07","MOA U17")
 colnames(con) <- c("lower","upper")
 con <- data.frame(con)
 con$estimate <- (con$lower + con$upper)/2
-con$MOA <- c("Non-treated", "MOA 11", "MOA 33", "MOA 4","MOA 40",
-             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+con$MOA <- c("MOA 11", "MOA 4","MOA 40",
+             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA P07","MOA U17")
 conf <- inner_join(con, DM3_meancountMOA, by="MOA")
 conf$N <- conf$n
 
@@ -27,32 +48,21 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
   theme_classic() + 
   geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
                                   axis.title=element_text(size=12,face="bold")) + 
-  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE) +
+  geom_vline(xintercept=0, linetype='dashed', color='red', size=0.5)
 dev.off()
 
-# Contrast
-
-library(multcomp)
-library(lme4)
-
-lsmeans(downy.lm1,pairwise ~ MOA)
-
-lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
-cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
-
-########## Washinngton State ##########
-
-# Estimated fixed effect
+# Washington
 
 con <- confint(downy.lm1, oldNames = FALSE)
-con <- con[c(4:8), ]
+con <- con[c(7:10), ]
 
 con <- as.matrix(con[,])
-rownames(con) <- c("Non-treated", "MOA 11", "MOA 22", "MOA 33","MOA 40")
+rownames(con) <- c("MOA 11", "MOA 22", "MOA 40","MOA P07")
 colnames(con) <- c("lower","upper")
 con <- data.frame(con)
 con$estimate <- (con$lower + con$upper)/2
-con$MOA <- c("Non-treated", "MOA 11", "MOA 22", "MOA 33","MOA 40")
+con$MOA <- c("MOA 11", "MOA 22", "MOA 40","MOA P07")
 
 conf <- inner_join(con, DM3_meancountMOA, by="MOA")
 conf$N <- conf$n
@@ -63,38 +73,24 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
   theme_classic() + 
   geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
                                   axis.title=element_text(size=12,face="bold")) + 
-  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE) +
+  geom_vline(xintercept=0, linetype='dashed', color='red', size=0.5) + xlim(-1.8, 0.1) 
 dev.off()
-
-
-# Contrast
-
-library(multcomp)
-library(lme4)
-
-lsmeans(downy.lm1,pairwise ~ MOA)
-
-lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
-cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
-
-
-########## Total ##########
-
-# Estimated fixed effect
+# Total
 
 con <- confint(downy.lm1, oldNames = FALSE)
-con <- con[c(4:19), ]
+con <- con[c(7:21), ]
 
 con <- as.matrix(con[,])
-rownames(con) <- c("Non-treated", "MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
-                   "MOA 33", "MOA 39", "MOA 4", "MOA 40",
-                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+rownames(con) <- c("MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
+                   "MOA 39", "MOA 4", "MOA 40",
+                   "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA P07", "MOA U17")
 colnames(con) <- c("lower","upper")
 con <- data.frame(con)
 con$estimate <- (con$lower + con$upper)/2
-con$MOA <- c("Non-treated", "MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
-             "MOA 33", "MOA 39", "MOA 4", "MOA 40",
-             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1", "MOA U17")
+con$MOA <- c("MOA 11", "MOA 11_7", "MOA 21", "MOA 22", "MOA 27_M1", 
+             "MOA 39", "MOA 4", "MOA 40",
+             "MOA 43","MOA 49_4","MOA 49_40", "MOA BM", "MOA M1","MOA P07", "MOA U17")
 conf <- inner_join(con, DM3_meancountMOA, by="MOA")
 conf$N <- conf$n
 
@@ -105,15 +101,14 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
   theme_classic() + 
   geom_point(aes(size=N)) + theme(axis.text=element_text(size=12),
                                   axis.title=element_text(size=12,face="bold")) + 
-  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE)
+  xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE) +
+  geom_vline(xintercept=0.02, linetype='dashed', color='red', size=0.5)
 dev.off()
 
-# Contrast
 
-library(multcomp)
-library(lme4)
+# Contrast
 
 lsmeans(downy.lm1,pairwise ~ MOA)
 
 lsm <- lsmeans(downy.lm1,pairwise ~ MOA)
-cld(lsm, decreasing = TRUE, Letters=c("abcdefg"))
+cld(lsm, decreasing = TRUE,  adjust = "sidak",Letters=c("abcdefg"))
