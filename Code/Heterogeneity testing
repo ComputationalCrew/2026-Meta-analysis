@@ -1,0 +1,66 @@
+### SAS Code ###
+
+/* Oregon  */
+FILENAME REFFILE '/.../Meta_downy_OR_GitHub.csv';
+
+/* Washington  */
+FILENAME REFFILE '/.../Meta_downy_WA_GitHub.csv';
+
+/* Total  */
+FILENAME REFFILE '/.../Meta_downy_GitHub.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.IMPORT4;
+	GETNAMES=YES;
+RUN;
+
+PROC CONTENTS DATA=WORK.IMPORT4; RUN;
+
+data inconsistency;
+    set WORK.IMPORT4;
+    char_Trial = put(Trial, 8.);
+    drop Trial;
+run;
+
+data inconsistency;
+    set inconsistency;
+    char_MOA = put(MOA, 8.);
+    drop MOA;
+run;
+
+data inconsistency;
+    set inconsistency;
+    char_Rep = put(Rep, 8.);
+    drop Rep;
+run;
+
+data inconsistency;
+    set inconsistency;
+    char_Group = put(Group, 8.);
+    drop Group;
+run;
+
+
+data inconsistency;
+    set inconsistency;
+    char_NumGroup = put(numberofgroup, 8.);
+    drop Group;
+run;
+
+PROC CONTENTS DATA=inconsistency; RUN;
+
+/* Table 4 */
+/* Heterogeneity testing */
+proc mixed data=inconsistency; 
+class char_NumGroup char_Trial char_MOA char_Rep; 
+model tResponse_ratio = char_NumGroup char_MOA char_MOA*char_NumGroup / s chisq ddfm=kr INFLUENCE (effect=char_MOA*char_Trial(char_Group) estimates iter=5) residual;
+random int char_MOA char_Rep/ subject=char_Trial(char_NumGroup) type=vc g gcorr;
+run;
+
+/* Influence */
+proc mixed data=inconsistency plots=all; 
+class char_Group char_Trial char_MOA char_Rep; 
+model tResponse_ratio = char_Group char_MOA char_MOA*char_Group / s CL INFLUENCE (effect=char_MOA*char_Trial(char_Group) estimates iter=5) residual chisq ddfm=kr outp=predresid2; 
+random int char_MOA char_Rep/ subject=char_Trial(char_Group) type=vc g gcorr s;
+run;
