@@ -43,17 +43,10 @@ run;
 
 PROC CONTENTS DATA=inconsistency; RUN;
 
-/* Table 4 */
-/* Heterogeneity testing */
+/* Table 5 */
+/* Design inconsistency testing */
 proc mixed data=inconsistency; 
 class char_Group char_Trial char_MOA char_Rep; 
 model tResponse_ratio = char_Group char_MOA char_MOA*char_Group / s chisq ddfm=kr;
 random int char_MOA char_Rep/ subject=char_Trial(char_Group) type=vc g gcorr;
-run;
-
-/* Influence */
-proc mixed data=inconsistency plots=all; 
-class char_Group char_Trial char_MOA char_Rep; 
-model tResponse_ratio = char_Group char_MOA char_MOA*char_Group / s CL INFLUENCE (effect=char_MOA*char_Trial(char_Group) estimates iter=5) residual chisq ddfm=kr outp=predresid2; 
-random int char_MOA char_Rep/ subject=char_Trial(char_Group) type=vc g gcorr s;
 run;
