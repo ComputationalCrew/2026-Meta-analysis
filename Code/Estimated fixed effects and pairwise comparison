@@ -26,27 +26,30 @@ Meta_downy <- read.csv("…/DM_GitHub_Total.csv", check.names=FALSE)
 
 Meta_downy <- within(Meta_downy, MOA <- relevel(MOA, ref = "Non-treated"))
 
-# Table 2 and Table 4 Main result and Model comparison 
+
 # In Oregon or Washington, it should delete State variable.
 
+# Supplemental Table 2
 downy.main <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State
                    , REML=TRUE, data = Meta_downy)
 summary(downy.main)
 
-
+# Supplemental Table 3
 downy.state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + MOA*State
                     , REML=TRUE, data = Meta_downy)
 summary(downy.state)
 
+# Table 4 and Supplemental Table 5 Main result and random effect 
 downy.mean_state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + meanSpikes +MOA*meanSpikes
                   , REML=TRUE, data = Meta_downy)
 summary(downy.mean_state)
 
+# Supplemental Table 4
 downy.mean <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes +MOA*meanSpikes
                    , REML=TRUE, data = Meta_downy)
 summary(downy.mean)
 
-# Compare models
+# Table 2. Compare models
 anova_result <- anova(downy.main, downy.state)
 print(anova_result)
 
@@ -149,8 +152,7 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
 dev.off()
 
 
-# Figure 2
-# Contrast
+# Figure 2 Contrast 
 
 lsmeans(downy.lm1,pairwise ~ MOA)
 
