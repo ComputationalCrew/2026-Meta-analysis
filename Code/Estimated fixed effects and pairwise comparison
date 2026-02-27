@@ -149,6 +149,7 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
 dev.off()
 
 
+# Figure 2
 # Contrast
 
 lsmeans(downy.lm1,pairwise ~ MOA)
