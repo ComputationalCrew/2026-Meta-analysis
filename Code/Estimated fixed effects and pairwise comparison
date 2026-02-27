@@ -11,6 +11,8 @@ library(pivottabler)
 library(stats)
 library(metafor)
 library(writexl)
+library(multcomp)
+library(lme4)
 
 
 # Create the data frame_Oregon
@@ -22,8 +24,48 @@ Meta_downy <- read.csv("…/DM_GitHub_WA.csv", check.names=FALSE)
 # Create the data frame_Total
 Meta_downy <- read.csv("…/DM_GitHub_Total.csv", check.names=FALSE)
 
-downy.lm1 <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) 
+Meta_downy <- within(Meta_downy, MOA <- relevel(MOA, ref = "Non-treated"))
+
+# Table 2 and Table 4 Main result and Model comparison 
+# In Oregon or Washington, it should delete State variable.
+
+downy.main <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State
+                   , REML=TRUE, data = Meta_downy)
+summary(downy.main)
+
+
+downy.state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + MOA*State
+                    , REML=TRUE, data = Meta_downy)
+summary(downy.state)
+
+downy.mean_state <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + State + meanSpikes +MOA*meanSpikes
                   , REML=TRUE, data = Meta_downy)
+summary(downy.mean_state)
+
+downy.mean <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) + meanSpikes +MOA*meanSpikes
+                   , REML=TRUE, data = Meta_downy)
+summary(downy.mean)
+
+# Compare models
+anova_result <- anova(downy.main, downy.state)
+print(anova_result)
+
+anova_result <- anova(downy.main, downy.mean_state)
+print(anova_result)
+
+anova_result <- anova(downy.main, downy.mean)
+print(anova_result)
+
+# Table 3 for type III Wald chi-square tests 
+
+anova_results <- Anova(downy.mean_state, type = "III")
+print(anova_results)
+
+# Supplemental Figure 1
+
+plot(downy.mean_state)
+qqnorm(resid(downy.mean_state))
+
 
 # Oregon
 # Fixed effect
@@ -76,6 +118,7 @@ ggplot(conf, aes(x=estimate, y=reorder(MOA, estimate), colour = MOA)) +
   xlab("Fixed effect with confidence interval") + ylab("MOA") + guides(color = FALSE) +
   geom_vline(xintercept=0, linetype='dashed', color='red', size=0.5) + xlim(-1.8, 0.1) 
 dev.off()
+
 # Total
 
 con <- confint(downy.lm1, oldNames = FALSE)
