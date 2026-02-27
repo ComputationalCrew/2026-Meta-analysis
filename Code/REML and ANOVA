@@ -25,10 +25,10 @@ Meta_downy <- read.csv("…/DM_GitHub_Total.csv", check.names=FALSE)
 downy.lm1 <- lmer(tResponse_ratio ~ MOA +  (1|Trial) + (1|Rep) + (1|MOA:Trial) + (1|Trial:Rep) 
                   , REML=TRUE, data = Meta_downy)
 
-# Table 3 and Supplemental Table 5
+# Table 4 and Supplemental Table 5
 summ(downy.lm1)
 
-# Table 2
+# Table 3
 anova_results <- Anova(downy.lm1, type = "III")
 print(anova_results)
 
