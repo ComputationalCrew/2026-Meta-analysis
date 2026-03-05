@@ -33,18 +33,16 @@ qpvt(downy, c("MOA", "State"), "Trial", "n()")
 # Figure 1 Distribution of the mean number of hop shoots 
 
 ggplot(downy, aes(x = Spikes, fill = Treat))+
-  geom_density(alpha = 0.5) +
-  labs(x = "Spikes per plant", y = "Density") +
-  theme_classic() + labs(fill = "MOA") +
-  scale_x_continuous(limits = c(0, 200))
-dev.off()
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Spikes per plant", y = "Frequency") +
+  theme_classic() +
+  coord_cartesian(xlim = c(0, 200), ylim = c(0, 800))
 
 ggplot(downy, aes(x = tResponse_ratio, fill = Treat)) +
-  geom_density(alpha = 0.5) +
-  labs(x = "Response ratio", y = "Density") +
-  theme_classic() + labs(fill = "MOA") +
-  scale_x_continuous(limits = c(-6, 1.5))
-dev.off()
+  geom_histogram(alpha = 0.5, position = "identity") +
+  labs(x = "Response ratio", y = "Frequency") +
+  theme_classic() +
+  coord_cartesian(xlim = c(-6, 1.5), ylim = c(0, 200))
 
 # If Oregon,
 downy_OR= subset(downy, State == "Oregon")
