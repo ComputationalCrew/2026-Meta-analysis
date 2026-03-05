@@ -48,6 +48,8 @@ dev.off()
 
 # If Oregon,
 downy_OR= subset(downy, State == "Oregon")
+ggplot(downy_OR,
 
 # If Washington,
 downy_WA= subset(downy, State == "Washington")
+ggplot(downy_WA,
